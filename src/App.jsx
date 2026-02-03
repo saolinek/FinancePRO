@@ -56,13 +56,17 @@ const App = () => {
             }
         };
 
+        // Always add listener when menu is shown, use 'click' for better touch support
         if (showUserMenu) {
-            document.addEventListener('mousedown', handleClickOutside);
+            // Use setTimeout to avoid immediate closing from the same click that opened the menu
+            const timer = setTimeout(() => {
+                document.addEventListener('click', handleClickOutside, true);
+            }, 0);
+            return () => {
+                clearTimeout(timer);
+                document.removeEventListener('click', handleClickOutside, true);
+            };
         }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
     }, [showUserMenu]);
 
     // Use local income only while editing; otherwise use Firebase income
@@ -231,54 +235,56 @@ const App = () => {
 
             {/* Header s informacemi z minulé výplaty - Fixed at top */}
             <div className="bg-white p-6 border-b border-slate-200 shadow-sm z-30 shrink-0">
+                {/* Profil - centered at top */}
+                <div className="flex justify-center mb-4">
+                    {authLoading ? (
+                        <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse" />
+                    ) : user ? (
+                        <div className="relative" ref={menuRef}>
+                            <button
+                                onClick={() => setShowUserMenu(!showUserMenu)}
+                                className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-full transition-colors"
+                            >
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt="" className="w-6 h-6 rounded-full" />
+                                ) : (
+                                    <User size={18} className="text-slate-600" />
+                                )}
+                                <span className="text-sm font-semibold text-slate-700 max-w-[100px] truncate">
+                                    {user.displayName || user.email?.split('@')[0]}
+                                </span>
+                            </button>
+                            {showUserMenu && (
+                                <div className="absolute left-1/2 -translate-x-1/2 top-12 bg-white shadow-lg rounded-2xl border border-slate-100 p-2 min-w-[150px] z-50">
+                                    <button
+                                        onClick={() => { logout(); setShowUserMenu(false); }}
+                                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                                    >
+                                        <LogOut size={16} /> Odhlásit se
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <button
+                            onClick={login}
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full font-semibold text-sm transition-colors shadow-lg shadow-indigo-200"
+                        >
+                            <LogIn size={16} /> Přihlásit se
+                        </button>
+                    )}
+                </div>
+
+                {/* Info row - Prémie a Zůstatek */}
                 <div className="flex justify-between items-center mb-4">
-                    <div className="flex-1">
+                    <div>
                         <h1 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                             <Star size={10} className="text-yellow-500 fill-yellow-500" /> Prémie v
                         </h1>
                         <p className="text-lg font-black text-slate-800">{nextPremiumMonthInfo}</p>
                     </div>
 
-                    <div className="flex-1 flex justify-center">
-                        {authLoading ? (
-                            <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse" />
-                        ) : user ? (
-                            <div className="relative" ref={menuRef}>
-                                <button
-                                    onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-full transition-colors"
-                                >
-                                    {user.photoURL ? (
-                                        <img src={user.photoURL} alt="" className="w-6 h-6 rounded-full" />
-                                    ) : (
-                                        <User size={18} className="text-slate-600" />
-                                    )}
-                                    <span className="text-sm font-semibold text-slate-700 max-w-[100px] truncate">
-                                        {user.displayName || user.email?.split('@')[0]}
-                                    </span>
-                                </button>
-                                {showUserMenu && (
-                                    <div className="absolute left-1/2 -translate-x-1/2 top-12 bg-white shadow-lg rounded-2xl border border-slate-100 p-2 min-w-[150px] z-50">
-                                        <button
-                                            onClick={() => { logout(); setShowUserMenu(false); }}
-                                            className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                                        >
-                                            <LogOut size={16} /> Odhlásit se
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <button
-                                onClick={login}
-                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full font-semibold text-sm transition-colors shadow-lg shadow-indigo-200"
-                            >
-                                <LogIn size={16} /> Přihlásit se
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="flex-1 text-right">
+                    <div className="text-right">
                         <h1 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zbyde z minulé výplaty</h1>
                         <p className={`text-xl font-black ${timelineData.remaining < 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
                             {timelineData.remaining.toLocaleString()} Kč
