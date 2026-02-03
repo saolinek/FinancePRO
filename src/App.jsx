@@ -11,12 +11,16 @@ import {
     AlertCircle,
     Save,
     Star,
-    Loader2
+    Loader2,
+    LogIn,
+    User,
+    LogOut
 } from 'lucide-react';
 import { useFirestore } from './hooks/useFirestore';
+import { useAuth } from './hooks/useAuth';
 
 const App = () => {
-    // --- FIREBASE HOOK ---
+    // --- FIREBASE HOOKS ---
     const {
         expenses,
         income,
@@ -25,6 +29,9 @@ const App = () => {
         deleteExpense,
         updateIncome
     } = useFirestore();
+
+    const { user, loading: authLoading, login, logout } = useAuth();
+    const [showUserMenu, setShowUserMenu] = useState(false);
 
     // --- STAV (STATE) ---
     const [modal, setModal] = useState(null);
@@ -205,6 +212,46 @@ const App = () => {
 
             {/* Header s informacemi z minulé výplaty */}
             <div className="bg-white p-6 border-b border-slate-200 shadow-sm sticky top-0 z-30">
+                {/* Login bar */}
+                <div className="flex justify-end mb-4">
+                    {authLoading ? (
+                        <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse" />
+                    ) : user ? (
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowUserMenu(!showUserMenu)}
+                                className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-full transition-colors"
+                            >
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt="" className="w-6 h-6 rounded-full" />
+                                ) : (
+                                    <User size={18} className="text-slate-600" />
+                                )}
+                                <span className="text-sm font-semibold text-slate-700 max-w-[120px] truncate">
+                                    {user.displayName || user.email?.split('@')[0]}
+                                </span>
+                            </button>
+                            {showUserMenu && (
+                                <div className="absolute right-0 top-12 bg-white shadow-lg rounded-2xl border border-slate-100 p-2 min-w-[150px] z-50">
+                                    <button
+                                        onClick={() => { logout(); setShowUserMenu(false); }}
+                                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                                    >
+                                        <LogOut size={16} /> Odhlásit se
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <button
+                            onClick={login}
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full font-semibold text-sm transition-colors shadow-lg shadow-indigo-200"
+                        >
+                            <LogIn size={16} /> Přihlásit se
+                        </button>
+                    )}
+                </div>
+
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h1 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
@@ -233,8 +280,8 @@ const App = () => {
                     <div
                         key={item.id}
                         className={`p-5 rounded-[2rem] border transition-all ${item.type === 'income'
-                                ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-100'
-                                : 'bg-white border-slate-100 shadow-sm'
+                            ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-100'
+                            : 'bg-white border-slate-100 shadow-sm'
                             }`}
                     >
                         <div className="flex justify-between items-center">
