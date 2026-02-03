@@ -350,14 +350,14 @@ const App = () => {
 
                                 <div className="space-y-3">
                                     {expenses.map(ex => (
-                                        <div key={ex.id} className={`flex items-center justify-between p-5 rounded-3xl border ${editingId === ex.id ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-100'}`}>
+                                        <div key={ex.id} className={`flex items-center justify-between p-5 rounded-3xl border ${editingId === ex.id ? 'bg-rose-600 border-rose-400 text-white' : 'bg-rose-500 border-rose-400 text-white'} shadow-sm`}>
                                             <div>
-                                                <div className="font-bold text-slate-800">{ex.name}</div>
-                                                <div className="text-xs text-slate-400 font-medium">{ex.day}. v měsíci • {ex.amount.toLocaleString()} Kč</div>
+                                                <div className="font-bold">{ex.name}</div>
+                                                <div className="text-xs opacity-80 font-medium">{ex.day}. v měsíci • {ex.amount.toLocaleString()} Kč</div>
                                             </div>
                                             <div className="flex gap-1">
-                                                <button onClick={() => startEdit(ex)} className="text-slate-400 p-2"><Edit3 size={18} /></button>
-                                                <button onClick={() => handleDeleteExpense(ex.id)} className="text-rose-400 p-2"><Trash2 size={18} /></button>
+                                                <button onClick={() => startEdit(ex)} className="text-white/70 hover:text-white p-2 transition-colors"><Edit3 size={18} /></button>
+                                                <button onClick={() => handleDeleteExpense(ex.id)} className="text-white/70 hover:text-white p-2 transition-colors"><Trash2 size={18} /></button>
                                             </div>
                                         </div>
                                     ))}
