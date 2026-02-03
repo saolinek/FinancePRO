@@ -227,10 +227,10 @@ const App = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 pb-40 select-none font-sans">
+        <div className="h-screen bg-slate-50 text-slate-900 select-none font-sans flex flex-col overflow-hidden">
 
-            {/* Header s informacemi z minulé výplaty */}
-            <div className="bg-white p-6 border-b border-slate-200 shadow-sm sticky top-0 z-30">
+            {/* Header s informacemi z minulé výplaty - Fixed at top */}
+            <div className="bg-white p-6 border-b border-slate-200 shadow-sm z-30 shrink-0">
                 <div className="flex justify-between items-center mb-4">
                     <div className="flex-1">
                         <h1 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
@@ -293,37 +293,39 @@ const App = () => {
                 </div>
             </div>
 
-            {/* Seznam položek */}
-            <div className="max-w-md mx-auto p-4 space-y-3">
-                {timelineData.items.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`p-5 rounded-[2rem] border transition-all ${item.type === 'income'
-                            ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-100'
-                            : 'bg-rose-500 border-rose-400 text-white shadow-xl shadow-rose-100'
-                            }`}
-                    >
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-2xl ${item.type === 'income' ? 'bg-white/20' : 'bg-white/20 text-white'}`}>
-                                    {item.type === 'income' ? <TrendingUp size={20} /> : <CreditCard size={20} />}
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-bold">{item.name}</span>
-                                        {item.isPremium && <span className="text-[9px] bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-black uppercase">Prémie</span>}
+            {/* Seznam položek - Scrollable area */}
+            <div className="flex-1 overflow-y-auto pt-4 pb-40 px-4">
+                <div className="max-w-md mx-auto space-y-3">
+                    {timelineData.items.map((item) => (
+                        <div
+                            key={item.id}
+                            className={`p-5 rounded-[2rem] border transition-all ${item.type === 'income'
+                                ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-100'
+                                : 'bg-rose-500 border-rose-400 text-white shadow-xl shadow-rose-100'
+                                }`}
+                        >
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-3 rounded-2xl ${item.type === 'income' ? 'bg-white/20' : 'bg-white/20 text-white'}`}>
+                                        {item.type === 'income' ? <TrendingUp size={20} /> : <CreditCard size={20} />}
                                     </div>
-                                    <div className={`text-xs ${item.type === 'income' ? 'text-emerald-50' : 'text-rose-50'}`}>
-                                        {item.date.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long' })}
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold">{item.name}</span>
+                                            {item.isPremium && <span className="text-[9px] bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-black uppercase">Prémie</span>}
+                                        </div>
+                                        <div className={`text-xs ${item.type === 'income' ? 'text-emerald-50' : 'text-rose-50'}`}>
+                                            {item.date.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long' })}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="text-lg font-black">
-                                {item.type === 'income' ? '+' : '-'}{item.amount.toLocaleString()} Kč
+                                <div className="text-lg font-black">
+                                    {item.type === 'income' ? '+' : '-'}{item.amount.toLocaleString()} Kč
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
 
             {/* Ovládací tlačítka */}
