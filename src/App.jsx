@@ -32,15 +32,15 @@ const App = () => {
     const [expenseForm, setExpenseForm] = useState({ name: '', amount: '', day: '1' });
     const [localIncome, setLocalIncome] = useState(null);
 
-    // Sync local income state when income from Firebase changes
+    // Sync local income only when editing salary to avoid overriding saved values
     React.useEffect(() => {
-        if (income && !localIncome) {
+        if (modal === 'salary' && income && !localIncome) {
             setLocalIncome(income);
         }
-    }, [income, localIncome]);
+    }, [income, localIncome, modal]);
 
-    // Use local income if set, otherwise use Firebase income
-    const currentIncome = localIncome || income;
+    // Use local income only while editing; otherwise use Firebase income
+    const currentIncome = modal === 'salary' ? (localIncome || income) : income;
 
     const monthNames = ["Lednu", "Únoru", "Březnu", "Dubnu", "Květnu", "Červnu", "Červenci", "Srpnu", "Září", "Říjnu", "Listopadu", "Prosinci"];
 
