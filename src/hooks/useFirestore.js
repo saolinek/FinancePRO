@@ -12,7 +12,7 @@ import {
 
 const DEFAULT_USER_ID = 'default-user';
 
-export function useFirestore(user) {
+export function useFirestore(user, authLoading) {
     const [expenses, setExpenses] = useState([]);
     const [income, setIncome] = useState({
         gross: 45000,
@@ -27,18 +27,22 @@ export function useFirestore(user) {
 
     // Safety timeout to prevent infinite loading
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (loading) {
-                console.warn('Firestore loading timed out, forcing app load.');
-                setLoading(false);
-            }
-        }, 3000); // 3 seconds timeout
+        if (!authLoading && loading) {
+            const timer = setTimeout(() => {
+                if (loading) {
+                    console.warn('Firestore loading timed out, forcing app load.');
+                    setLoading(false);
+                }
+            }, 3000); // 3 seconds timeout
 
-        return () => clearTimeout(timer);
-    }, [loading]);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, authLoading]);
 
     // Listen to expenses collection
     useEffect(() => {
+        if (authLoading) return;
+
         setLoading(true);
         const expensesRef = collection(db, 'users', userId, 'expenses');
 
@@ -57,10 +61,11 @@ export function useFirestore(user) {
         });
 
         return () => unsubscribe();
-    }, [userId]);
+    }, [userId, authLoading]);
 
     // Listen to income document
     useEffect(() => {
+        if (authLoading) return;
         // Don't reset loading here to avoid flickering, expenses is the main driver
         const incomeRef = doc(db, 'users', userId, 'settings', 'income');
 
@@ -77,7 +82,7 @@ export function useFirestore(user) {
         });
 
         return () => unsubscribe();
-    }, [userId]);
+    }, [userId, authLoading, initializeDefaults]);
 
     // Add or update expense
     const saveExpense = useCallback(async (expense) => {
