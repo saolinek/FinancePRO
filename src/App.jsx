@@ -20,6 +20,8 @@ import { useFirestore } from './hooks/useFirestore';
 import { useAuth } from './hooks/useAuth';
 
 const App = () => {
+    const { user, loading: authLoading, login, logout } = useAuth();
+
     // --- FIREBASE HOOKS ---
     const {
         expenses,
@@ -28,9 +30,8 @@ const App = () => {
         saveExpense,
         deleteExpense,
         updateIncome
-    } = useFirestore();
+    } = useFirestore(user);
 
-    const { user, loading: authLoading, login, logout } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
 
     // --- STAV (STATE) ---
@@ -143,7 +144,7 @@ const App = () => {
         return {
             items: [...upcomingExpenses, {
                 id: 'payday',
-                name: 'Příští výplata (čistá)',
+                name: 'Příští výplata',
                 amount: nextPaydayNet,
                 date: nextPaydayDate,
                 type: 'income',
@@ -213,7 +214,7 @@ const App = () => {
             {/* Header s informacemi z minulé výplaty */}
             <div className="bg-white p-6 border-b border-slate-200 shadow-sm sticky top-0 z-30">
                 {/* Login bar */}
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-center mb-4">
                     {authLoading ? (
                         <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse" />
                     ) : user ? (
@@ -281,12 +282,12 @@ const App = () => {
                         key={item.id}
                         className={`p-5 rounded-[2rem] border transition-all ${item.type === 'income'
                             ? 'bg-emerald-600 border-emerald-500 text-white shadow-xl shadow-emerald-100'
-                            : 'bg-white border-slate-100 shadow-sm'
+                            : 'bg-rose-500 border-rose-400 text-white shadow-xl shadow-rose-100'
                             }`}
                     >
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-2xl ${item.type === 'income' ? 'bg-white/20' : 'bg-rose-50 text-rose-500'}`}>
+                                <div className={`p-3 rounded-2xl ${item.type === 'income' ? 'bg-white/20' : 'bg-white/20 text-white'}`}>
                                     {item.type === 'income' ? <TrendingUp size={20} /> : <CreditCard size={20} />}
                                 </div>
                                 <div>
@@ -294,7 +295,7 @@ const App = () => {
                                         <span className="font-bold">{item.name}</span>
                                         {item.isPremium && <span className="text-[9px] bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-black uppercase">Prémie</span>}
                                     </div>
-                                    <div className={`text-xs ${item.type === 'income' ? 'text-emerald-50' : 'text-slate-400'}`}>
+                                    <div className={`text-xs ${item.type === 'income' ? 'text-emerald-50' : 'text-rose-50'}`}>
                                         {item.date.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long' })}
                                     </div>
                                 </div>
